@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supprimer votre compte TRA-MANAGER</title>
+<meta name="description" content="Supprimer votre compte de sauvegarde en ligne TRA-MANAGER et toutes les données associées.">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+  :root { --navy:#0f1b3d; --blue:#2563eb; --blue-d:#1d4ed8; --red:#dc2626; --amber:#f5b400; --ink:#111827; --muted:#4b5563; --line:#e5e7eb; --bg:#f3f5f9; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--navy); color:#fff; padding:20px 16px; }
+  header .in, main { max-width:720px; margin:0 auto; }
+  header .in { display:flex; align-items:center; gap:12px; }
+  header img { width:44px; height:44px; }
+  header b { font-size:20px; letter-spacing:.5px; display:block; }
+  header span { color:var(--amber); font-size:13px; font-weight:600; }
+  main { padding:24px 16px 48px; }
+  h1 { font-size:26px; margin:0 0 6px; }
+  h2 { font-size:19px; margin:28px 0 8px; }
+  p { margin:8px 0; color:var(--muted); }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px; margin-top:14px; }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  input { width:100%; height:48px; border:1px solid #cbd5e1; border-radius:10px; padding:0 12px; font-size:16px; }
+  input:focus { outline:2px solid var(--blue); border-color:var(--blue); }
+  button, input { font-family:inherit; }
+  button { margin-top:16px; width:100%; height:50px; border:0; border-radius:12px; background:var(--red); color:#fff; font-size:16px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .ok { background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; border-radius:12px; padding:12px; margin-top:14px; }
+  .err { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; border-radius:12px; padding:12px; margin-top:14px; }
+  ul { padding-left:20px; color:var(--muted); } li { margin:4px 0; }
+  .note { font-size:14px; }
+  a { color:var(--blue-d); }
+  footer { text-align:center; color:var(--muted); font-size:13px; padding:16px; }
+</style>
+</head>
+<body>
+<header><div class="in"><img src="logo.svg" alt=""><div><b>TRA-MANAGER</b><span>By Tra Business Center</span></div></div></header>
+<main>
+  <h1>Supprimer votre compte</h1>
+  <p>Cette page permet de supprimer votre <b>compte de sauvegarde en ligne</b> TRA-MANAGER et <b>toutes les données</b> qui y sont associées.</p>
+
+  <h2>1. Supprimer maintenant (immédiat)</h2>
+  <div class="card">
+    <p class="note">Saisissez le numéro et le <b>mot de passe de la sauvegarde en ligne</b> (celui choisi dans TRA-MANAGER › Paramètres › Sauvegarde en ligne).</p>
+    <form id="f">
+      <label for="tel">Numéro de téléphone</label>
+      <input id="tel" type="tel" inputmode="tel" autocomplete="username" placeholder="Ex : 92 15 58 70" required>
+      <label for="mdp">Mot de passe de la sauvegarde</label>
+      <input id="mdp" type="password" autocomplete="current-password" minlength="6" required>
+      <button id="go" type="submit">Supprimer définitivement mon compte</button>
+    </form>
+    <div id="msg" role="status" aria-live="polite"></div>
+  </div>
+
+  <h2>Ce qui est supprimé</h2>
+  <ul>
+    <li>le compte de sauvegarde en ligne (numéro et mot de passe) ;</li>
+    <li>toute la copie en ligne de l'entreprise : articles, stock, ventes, clients, fournisseurs, dépenses, comptes des collaborateurs et photos ;</li>
+    <li>la liste des appareils reliés.</li>
+  </ul>
+  <p>La suppression est <b>immédiate et définitive</b>. Rien n'est conservé.</p>
+
+  <h2>2. Depuis l'application</h2>
+  <p>TRA-MANAGER › <b>Paramètres</b> › <b>Sauvegarde en ligne</b> › <b>Supprimer mon compte en ligne et sa copie</b>.</p>
+
+  <h2>3. Par WhatsApp ou téléphone</h2>
+  <p>Envoyez « Supprimer mon compte TRA-MANAGER » depuis le numéro du compte au Service Client :
+     <a href="https://wa.me/22392155870?text=Supprimer%20mon%20compte%20TRA-MANAGER">+223 92 15 58 70</a> ou +223 92 83 26 92.
+     La suppression est faite sous 7 jours au plus tard, et vous recevez une confirmation.</p>
+
+  <h2>Et les données enregistrées sur votre appareil ?</h2>
+  <p>Sans sauvegarde en ligne, TRA-MANAGER enregistre tout <b>uniquement sur votre téléphone ou votre ordinateur</b> : nous n'y avons pas accès.
+     Pour les effacer, désinstallez l'application (sur Windows, supprimez aussi le dossier de données indiqué dans le menu Fichier).</p>
+  <p class="note"><a href="confidentialite.html">Politique de confidentialité</a></p>
+</main>
+<footer>TRA-MANAGER · Tra Business Center · Bamako, Mali</footer>
+<script>
+  // Projet Supabase de TRA-MANAGER (clé publique : sans danger, la sécurité est assurée par le compte)
+  var URL_ = 'https://vcwwvolnyndmygshpvrf.supabase.co';
+  var KEY = 'sb_publishable_-NDodfHiLYDpzmFe2iA6Ng_q3s2ru4H';
+  // Même règle que l'application : numéro malien sans indicatif → +223
+  function emailDe(saisie) {
+    var s = String(saisie || '').trim();
+    if (s.indexOf('@') > 0) return s.toLowerCase();
+    var plus = s.charAt(0) === '+' || s.indexOf('00') === 0;
+    var d = s.replace(/\D/g, '');
+    if (s.indexOf('00') === 0) d = d.slice(2);
+    if (!plus && d.length === 8) d = '223' + d;
+    if (d.length < 8 || d.length > 15) return null;
+    return d + '@tel.tra-manager.app';
+  }
+  function afficher(type, texte) { var m = document.getElementById('msg'); m.className = type; m.textContent = texte; }
+  document.getElementById('f').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var email = emailDe(document.getElementById('tel').value);
+    var mdp = document.getElementById('mdp').value;
+    if (!email) return afficher('err', 'Numéro de téléphone invalide.');
+    if (!confirm('Supprimer définitivement ce compte en ligne et toutes ses données ? Cette action est irréversible.')) return;
+    var b = document.getElementById('go'); b.disabled = true; b.textContent = 'Suppression en cours…'; afficher('', '');
+    try {
+      var r = await fetch(URL_ + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ email: email, password: mdp }) });
+      var j = await r.json().catch(function () { return {}; });
+      if (!r.ok) throw new Error(r.status === 400 ? 'Numéro ou mot de passe incorrect (ou compte déjà supprimé).' : (j.msg || j.message || 'Erreur ' + r.status));
+      var d = await fetch(URL_ + '/rest/v1/rpc/tm_delete_account', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + j.access_token }, body: '{}' });
+      if (!d.ok) { var k = await d.json().catch(function () { return {}; }); throw new Error(k.message || 'Erreur ' + d.status); }
+      document.getElementById('f').reset();
+      afficher('ok', '✓ Votre compte en ligne et toutes ses données ont été supprimés définitivement.');
+    } catch (err) {
+      afficher('err', err && err.message && err.message !== 'Failed to fetch' ? err.message : 'Connexion impossible. Vérifiez Internet et réessayez, ou contactez le Service Client.');
+    } finally { b.disabled = false; b.textContent = 'Supprimer définitivement mon compte'; }
+  });
+</script>
+</body>
+</html>
