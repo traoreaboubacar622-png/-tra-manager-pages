@@ -3,20 +3,271 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TRA-MANAGER</title>
+<title>TRA-MANAGER · Caisse et stock pour commerçants</title>
+<meta name="description" content="TRA-MANAGER : la caisse et le stock de votre boutique, même sans Internet. Android et Windows. Licence payable par Orange Money.">
+<meta property="og:title" content="TRA-MANAGER · By Tra Business Center">
+<meta property="og:description" content="La caisse et le stock de votre boutique, même sans Internet. 15 jours d'essai gratuit.">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <style>
-  body { margin:0; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:#0f1b3d; color:#fff;
-         font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; text-align:center; padding:24px; box-sizing:border-box; }
-  img { width:96px; height:96px; } h1 { margin:0; letter-spacing:1px; } .s { color:#f5b400; font-weight:600; margin-top:-8px; }
-  a { color:#fff; background:#2563eb; padding:12px 18px; border-radius:12px; text-decoration:none; font-weight:600; display:inline-block; margin:4px; }
+  :root { --navy:#0f1b3d; --navy2:#16255a; --blue:#2563eb; --blue-d:#1d4ed8; --amber:#f5b400; --green:#16a34a;
+          --ink:#111827; --muted:#4b5563; --line:#e5e7eb; --bg:#f3f5f9; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:#fff; }
+  a { color:var(--blue-d); }
+  .in { max-width:1040px; margin:0 auto; padding:0 16px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 20px; border-radius:12px;
+         font-weight:700; text-decoration:none; border:0; cursor:pointer; font-size:16px; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#ffc42e; }
+  .btn-ghost { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.25); }
+  .btn-blue { background:var(--blue); color:#fff; } .btn-blue:hover { background:var(--blue-d); }
+  .btn-line { background:#fff; color:var(--navy); border:2px solid var(--line); }
+  .wa { width:20px; height:20px; flex:none; }
+
+  /* En-tête */
+  header { background:var(--navy); color:#fff; position:sticky; top:0; z-index:10; }
+  header .in { display:flex; align-items:center; gap:12px; height:64px; }
+  .marque { display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; min-width:0; }
+  .marque img { width:38px; height:38px; }
+  .marque b { display:block; font-size:18px; letter-spacing:.5px; line-height:1.1; }
+  .marque span { display:block; color:var(--amber); font-size:11px; font-weight:600; }
+  nav { margin-left:auto; display:flex; align-items:center; gap:4px; }
+  nav a { color:#cbd5e1; text-decoration:none; padding:8px 10px; border-radius:8px; font-size:15px; }
+  nav a:hover { color:#fff; background:rgba(255,255,255,.08); }
+  nav .btn { padding:9px 14px; font-size:15px; margin-left:6px; }
+  @media (max-width:760px) { nav a:not(.btn) { display:none; } }
+
+  /* Accueil */
+  .hero { background:radial-gradient(1200px 500px at 85% -10%, #2a43a0 0%, transparent 60%), var(--navy); color:#fff; padding:56px 0 64px; }
+  .hero h1 { font-size:clamp(30px,5.5vw,50px); line-height:1.12; margin:0 0 14px; max-width:720px; }
+  .hero h1 em { font-style:normal; color:var(--amber); }
+  .hero p { color:#cbd5e1; font-size:18px; max-width:620px; margin:0 0 26px; }
+  .hero .cta { display:flex; flex-wrap:wrap; gap:10px; }
+  .badges { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:26px; color:#e2e8f0; font-size:15px; }
+  .badges span::before { content:"✓"; color:var(--amber); font-weight:800; margin-right:6px; }
+
+  section { padding:56px 0; }
+  section.gris { background:var(--bg); }
+  h2 { font-size:clamp(24px,4vw,32px); margin:0 0 6px; line-height:1.2; }
+  .sous { color:var(--muted); margin:0 0 28px; }
+
+  /* Tarifs */
+  .prix { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:760px; }
+  .carte { background:#fff; border:2px solid var(--line); border-radius:18px; padding:24px; display:flex; flex-direction:column; position:relative; }
+  .carte.top { border-color:var(--blue); box-shadow:0 10px 30px rgba(37,99,235,.12); }
+  .ruban { position:absolute; top:-13px; left:24px; background:var(--amber); color:var(--navy); font-size:13px; font-weight:800; padding:3px 12px; border-radius:99px; }
+  .carte h3 { margin:0 0 6px; font-size:19px; }
+  .montant { font-size:38px; font-weight:800; color:var(--navy); line-height:1.1; margin:6px 0 2px; }
+  .montant small { font-size:16px; font-weight:600; color:var(--muted); }
+  .carte p { color:var(--muted); margin:6px 0 20px; flex:1; }
+  .carte .btn { width:100%; }
+  .note { color:var(--muted); font-size:14px; margin-top:16px; }
+
+  .titre-f { font-size:18px; margin:0 0 14px; } .titre-f span { color:var(--muted); font-weight:500; font-size:15px; }
+  .multi { background:#fff; border:2px solid var(--line); border-radius:18px; padding:6px 20px; max-width:760px; }
+  .ligne { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:16px; padding:16px 0; border-bottom:1px solid var(--line); }
+  .ligne .nom b, .ligne .tarif b { display:block; font-size:18px; } .ligne .tarif b { display:inline; font-size:22px; color:var(--navy); }
+  .ligne small { display:block; color:var(--muted); font-size:14px; } .ligne .tarif { color:var(--muted); font-size:15px; }
+  .ligne .btn { padding:10px 18px; }
+  .plus { color:var(--muted); font-size:14px; margin:12px 0 10px; }
+  @media (max-width:560px) { .ligne { grid-template-columns:1fr auto; } .ligne .btn { grid-column:1 / -1; width:100%; } }
+
+  /* Étapes */
+  .etapes { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; counter-reset:n; }
+  .etape { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .etape::before { counter-increment:n; content:counter(n); display:grid; place-items:center; width:36px; height:36px; border-radius:50%;
+                   background:var(--navy); color:var(--amber); font-weight:800; margin-bottom:10px; }
+  .etape b { display:block; margin-bottom:4px; } .etape span { color:var(--muted); font-size:15px; }
+
+  /* Téléchargement */
+  .dl { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+  .dl .carte p { margin-bottom:16px; }
+  .os { display:flex; align-items:center; gap:12px; margin-bottom:4px; }
+  .os svg { width:34px; height:34px; flex:none; }
+
+  /* Questions */
+  details { background:#fff; border:1px solid var(--line); border-radius:14px; padding:0 18px; margin-bottom:10px; }
+  summary { cursor:pointer; font-weight:700; padding:16px 0; list-style:none; display:flex; justify-content:space-between; gap:12px; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"+"; color:var(--blue); font-size:22px; line-height:1; }
+  details[open] summary::after { content:"−"; }
+  details p { margin:0 0 16px; color:var(--muted); }
+
+  /* Contact */
+  .contact { background:var(--navy); color:#fff; border-radius:22px; padding:32px 24px; display:flex; flex-wrap:wrap; align-items:center; gap:20px; }
+  .contact h2 { color:#fff; } .contact p { color:#cbd5e1; margin:0; }
+  .contact .g { flex:1 1 320px; } .contact .cta { display:flex; flex-wrap:wrap; gap:10px; }
+
+  footer { padding:28px 0 36px; color:#6b7280; font-size:14px; }
+  footer .in { display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:space-between; }
+  footer a { color:#6b7280; }
 </style>
 </head>
 <body>
-  <img src="logo.svg" alt="">
-  <h1>TRA-MANAGER</h1>
-  <div class="s">By Tra Business Center</div>
-  <p>Gestion commerciale simple pour les commerçants : caisse, stock, ventes et crédits, même sans Internet.</p>
-  <div><a href="confidentialite.html">Politique de confidentialité</a><a href="supprimer-compte.html">Supprimer votre compte</a></div>
+
+<header>
+  <div class="in">
+    <a class="marque" href="#"><img src="logo.svg" alt=""><div><b>TRA-MANAGER</b><span>By Tra Business Center</span></div></a>
+    <nav>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#telecharger">Télécharger</a>
+      <a href="#questions">Questions</a>
+      <a href="#contact">Contact</a>
+      <a class="btn btn-amber achat" href="acheter-licence.html">Acheter</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="in">
+    <h1>La caisse et le stock de votre boutique, <em>même sans Internet.</em></h1>
+    <p>TRA-MANAGER est l'application de gestion faite pour les commerçants du Mali, sur téléphone Android et sur ordinateur Windows.</p>
+    <div class="cta">
+      <a class="btn btn-amber achat" href="acheter-licence.html">Acheter ma licence</a>
+      <a class="btn btn-ghost" href="#telecharger">Télécharger l'application</a>
+    </div>
+    <div class="badges"><span>15 jours d'essai gratuit</span><span>Paiement par Orange Money</span><span>Service client au Mali</span></div>
+  </div>
+</div>
+
+<section id="tarifs" class="gris">
+  <div class="in">
+    <h2>Tarifs</h2>
+    <p class="sous">Pas d'engagement : vous renouvelez quand vous voulez.</p>
+    <h3 class="titre-f">Solo <span>· 1 poste, pour une boutique</span></h3>
+    <div class="prix">
+      <div class="carte">
+        <h3>1 mois</h3>
+        <div class="montant">3 000 <small>FCFA</small></div>
+        <p>Pour démarrer en douceur. Payez mois après mois.</p>
+        <a class="btn btn-line achat" data-mois="1" href="acheter-licence.html?mois=1">Choisir 1 mois</a>
+      </div>
+      <div class="carte top">
+        <span class="ruban">2 mois offerts</span>
+        <h3>12 mois</h3>
+        <div class="montant">30 000 <small>FCFA</small></div>
+        <p>Toute l'année tranquille, au prix de 10 mois.</p>
+        <a class="btn btn-blue achat" data-mois="12" href="acheter-licence.html?mois=12">Choisir 12 mois</a>
+      </div>
+    </div>
+    <h3 class="titre-f" style="margin-top:36px">Plusieurs caisses ? <span>· tous les postes de la boutique travaillent ensemble</span></h3>
+    <div class="multi">
+      <div class="ligne">
+        <div class="nom"><b>Commerce</b><small>jusqu'à 3 postes</small></div>
+        <div class="tarif"><b>7 500</b> FCFA / mois<small>ou 75 000 FCFA / an</small></div>
+        <a class="btn btn-line achat" data-formule="commerce" href="acheter-licence.html?formule=commerce&amp;mois=12">Choisir</a>
+      </div>
+      <div class="ligne">
+        <div class="nom"><b>Entreprise</b><small>jusqu'à 10 postes</small></div>
+        <div class="tarif"><b>15 000</b> FCFA / mois<small>ou 150 000 FCFA / an</small></div>
+        <a class="btn btn-blue achat" data-formule="entreprise" href="acheter-licence.html?formule=entreprise&amp;mois=12">Choisir</a>
+      </div>
+      <p class="plus">Entreprise comprend l'installation et la formation de votre équipe, et le support prioritaire sur WhatsApp.
+        Plus de 10 postes ? <a href="https://wa.me/22392155870?text=Bonjour%2C%20je%20veux%20un%20devis%20TRA-MANAGER%20pour%20plus%20de%2010%20postes." target="_blank" rel="noopener">Demandez un devis</a>.</p>
+    </div>
+    <p class="note">Vous renouvelez avant la fin ? Collez votre clé actuelle sur la page d'achat : vous ne perdez aucun jour.</p>
+  </div>
+</section>
+
+<section id="comment">
+  <div class="in">
+    <h2>Comment acheter ?</h2>
+    <p class="sous">C'est rapide, et votre clé arrive tout de suite.</p>
+    <div class="etapes">
+      <div class="etape"><b>Installez et essayez</b><span>Téléchargez TRA-MANAGER : vous avez 15 jours pour l'essayer gratuitement.</span></div>
+      <div class="etape"><b>Notez le code de l'appareil</b><span>Dans l'application, ouvrez la page Licence. Le code ressemble à <span style="white-space:nowrap">TM-XXXX-XXXX-XXXX</span>.</span></div>
+      <div class="etape"><b>Payez par Mobile Money</b><span>Sur la page d'achat, choisissez la formule et validez avec Orange Money.</span></div>
+      <div class="etape"><b>Collez votre clé</b><span>La clé s'affiche après le paiement. Collez-la dans l'application. Sur Windows, elle s'active toute seule.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="telecharger" class="gris">
+  <div class="in">
+    <h2>Télécharger</h2>
+    <p class="sous">La même application, sur votre téléphone et sur l'ordinateur de la boutique.</p>
+    <div class="dl">
+      <div class="carte">
+        <div class="os">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#3ddc84" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+          <h3 style="margin:0">Téléphone Android</h3>
+        </div>
+        <p>Sur Google Play. Fonctionne hors ligne, imprime les reçus en Bluetooth.</p>
+        <a class="btn btn-blue" href="https://play.google.com/store/apps/details?id=ml.tramanager.app" target="_blank" rel="noopener">Ouvrir Google Play</a>
+      </div>
+      <div class="carte">
+        <div class="os">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0078d4" d="M2 4.6l8.2-1.1v7.9H2zm9.2-1.3L22 1.8v9.6H11.2zM2 12.4h8.2v7.9L2 19.2zm9.2 0H22V22l-10.8-1.5z"/></svg>
+          <h3 style="margin:0">Ordinateur Windows</h3>
+        </div>
+        <p>Pour la caisse principale. Plusieurs postes peuvent travailler ensemble dans la boutique.</p>
+        <a class="btn btn-line" target="_blank" rel="noopener"
+           href="https://wa.me/22392155870?text=Bonjour%2C%20je%20veux%20installer%20TRA-MANAGER%20sur%20mon%20ordinateur%20Windows.">
+          <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="#25d366" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
+          Demander l'installateur
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="questions">
+  <div class="in" style="max-width:780px">
+    <h2>Questions fréquentes</h2>
+    <p class="sous">Vous ne trouvez pas votre réponse ? Écrivez-nous sur WhatsApp.</p>
+    <details><summary>Faut-il Internet pour utiliser TRA-MANAGER ?</summary>
+      <p>Non. Tout fonctionne sans Internet : ventes, stock, crédits, reçus. Internet sert seulement si vous activez la sauvegarde en ligne, ou pour payer votre licence.</p></details>
+    <details><summary>Où sont enregistrées mes données ?</summary>
+      <p>Sur votre téléphone ou votre ordinateur. Si vous activez la sauvegarde en ligne, une copie protégée est gardée sur Internet. Elle vous permet de retrouver vos données si vous perdez votre téléphone, et de travailler sur le téléphone et l'ordinateur avec le même compte. Voir la <a href="confidentialite.html">politique de confidentialité</a>.</p></details>
+    <details><summary>Où trouver le code de mon appareil ?</summary>
+      <p>Dans l'application, ouvrez la page Licence. Le code ressemble à <span style="white-space:nowrap">TM-XXXX-XXXX-XXXX</span>. Chaque appareil a son propre code, et la clé achetée ne marche que sur cet appareil.</p></details>
+    <details><summary>J'ai payé mais je n'ai pas reçu ma clé.</summary>
+      <p>Restez sur la page après avoir validé le paiement sur votre téléphone : la clé s'affiche en général en moins d'une minute. Sinon, envoyez-nous sur WhatsApp le numéro qui a payé et le code de votre appareil, et nous vous envoyons la clé.</p></details>
+    <details><summary>Comment renouveler ma licence ?</summary>
+      <p>Achetez une nouvelle formule avec le même code d'appareil. Si votre licence est encore valable, collez votre clé actuelle sur la page d'achat : la nouvelle période commence à la fin de l'ancienne, vous ne perdez aucun jour.</p></details>
+    <details><summary>Je change de téléphone, je perds mes données ?</summary>
+      <p>Non, si vous avez activé la sauvegarde en ligne : installez TRA-MANAGER sur le nouveau téléphone et touchez « Récupérer mes données depuis Internet ». Pour la licence, contactez-nous avec l'ancien et le nouveau code.</p></details>
+  </div>
+</section>
+
+<section id="contact" style="padding-top:0">
+  <div class="in">
+    <div class="contact">
+      <div class="g">
+        <h2>Besoin d'aide ?</h2>
+        <p>Service Client TRA-MANAGER · +223 92 15 58 70 · +223 92 83 26 92</p>
+      </div>
+      <div class="cta">
+        <a class="btn btn-amber" href="https://wa.me/22392155870" target="_blank" rel="noopener">
+          <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
+          WhatsApp
+        </a>
+        <a class="btn btn-ghost" href="tel:+22392832692">Appeler</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="in">
+    <span>© TRA-MANAGER · Tra Business Center · Bamako, Mali</span>
+    <span><a href="confidentialite.html">Confidentialité</a> · <a href="supprimer-compte.html">Supprimer votre compte</a></span>
+  </div>
+</footer>
+
+<script>
+  // Lien d'agent : ...github.io/-tra-manager-pages/?agent=AG-07 → le code suit le client jusqu'à la page d'achat
+  (function () {
+    var agent = null;
+    try { agent = new URLSearchParams(location.search).get('agent'); } catch (e) {}
+    if (!agent) return;
+    agent = agent.slice(0, 40);
+    Array.prototype.forEach.call(document.querySelectorAll('a.achat'), function (a) {
+      var m = a.getAttribute('data-mois'), f = a.getAttribute('data-formule');
+      a.href = 'acheter-licence.html?' + (f ? 'formule=' + f + '&mois=12&' : '') + (m ? 'mois=' + m + '&' : '') + 'agent=' + encodeURIComponent(agent);
+    });
+  })();
+</script>
 </body>
 </html>
