@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Agents TRA-MANAGER</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+  :root { --navy:#0f1b3d; --blue:#2563eb; --blue-d:#1d4ed8; --amber:#f5b400; --green:#047857; --green-bg:#dcfce7; --red:#b91c1c; --ink:#111827; --muted:#4b5563; --line:#e5e7eb; --bg:#f3f5f9; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--navy); color:#fff; padding:14px 16px; }
+  header .in, main { max-width:1040px; margin:0 auto; }
+  header .in { display:flex; align-items:center; gap:12px; }
+  header img { width:40px; height:40px; }
+  header b { font-size:19px; display:block; line-height:1.15; }
+  header span { color:var(--amber); font-size:13px; font-weight:600; }
+  header .sortir { margin-left:auto; }
+  main { padding:20px 16px 48px; }
+  h1 { font-size:24px; margin:0; } h2 { font-size:18px; margin:28px 0 10px; }
+  p { margin:6px 0; color:var(--muted); }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; }
+  label { display:block; font-weight:600; margin:10px 0 4px; }
+  input { width:100%; font:inherit; font-size:16px; padding:11px 12px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; }
+  input:focus { outline:2px solid var(--blue); outline-offset:1px; }
+  button, .btn { font:inherit; font-weight:700; border:0; border-radius:10px; padding:10px 14px; cursor:pointer; background:var(--blue); color:#fff; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  button:hover, .btn:hover { background:var(--blue-d); }
+  .ghost { background:#fff; color:var(--navy); border:1px solid #cbd5e1; }
+  .ghost:hover { background:#f1f5f9; }
+  .petit { padding:7px 10px; font-size:14px; }
+  header .ghost { background:transparent; color:#fff; border-color:rgba(255,255,255,.35); }
+  .hidden { display:none !important; }
+  .msg { margin-top:10px; font-size:15px; } .msg.err { color:var(--red); } .msg.ok { color:var(--green); }
+  .barre { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+  .mois { display:flex; align-items:center; gap:8px; }
+  .mois b { min-width:150px; text-align:center; font-size:18px; text-transform:capitalize; }
+  .chiffres { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap:12px; }
+  .chiffres .card small { color:var(--muted); font-weight:600; display:block; }
+  .chiffres .card strong { font-size:24px; display:block; margin-top:2px; white-space:nowrap; }
+  .taux { font-size:14px; color:var(--muted); margin-top:10px; }
+  .agents { display:grid; gap:12px; }
+  .agent .haut { display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .agent .nom { font-weight:800; font-size:17px; }
+  .agent .code { font-family:ui-monospace,Consolas,monospace; background:#eef2ff; color:var(--blue-d); border-radius:6px; padding:1px 7px; font-size:14px; font-weight:700; }
+  .agent .inconnu { background:#fef3c7; color:#92400e; border-radius:6px; padding:1px 7px; font-size:13px; font-weight:700; }
+  .agent .total { text-align:right; }
+  .agent .total strong { font-size:22px; display:block; }
+  .agent .total small { color:var(--muted); }
+  .stats { display:flex; flex-wrap:wrap; gap:6px 18px; margin:10px 0; font-size:15px; color:var(--muted); }
+  .stats b { color:var(--ink); }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .paye { background:var(--green-bg); color:var(--green); font-weight:700; border-radius:999px; padding:4px 10px; font-size:14px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:10px; }
+  th, td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:700; }
+  td.n, th.n { text-align:right; white-space:nowrap; }
+  .tableau { overflow-x:auto; }
+  .ajout { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap:0 12px; align-items:end; }
+  .ajout button { margin-top:10px; height:46px; }
+  .vide { text-align:center; padding:28px 16px; color:var(--muted); }
+</style>
+</head>
+<body>
+<header><div class="in"><img src="logo.svg" alt=""><div><b>Agents commerciaux</b><span>TRA-MANAGER · tableau de bord</span></div>
+  <button class="ghost petit sortir hidden" id="sortir" type="button">Se déconnecter</button></div></header>
+<main>
+
+  <section id="connexion" class="card" style="max-width:460px; margin:20px auto">
+    <h1>Accès réservé</h1>
+    <p>Entrez la clé administrateur (le secret ADMIN_KEY de Supabase).</p>
+    <form id="formCle">
+      <label for="cle">Clé administrateur</label>
+      <input id="cle" type="password" autocomplete="current-password" required>
+      <label style="display:flex; align-items:center; gap:8px; font-weight:500"><input id="retenir" type="checkbox" style="width:auto"> Se souvenir sur cet appareil</label>
+      <button type="submit" style="margin-top:12px; width:100%; justify-content:center">Ouvrir le tableau de bord</button>
+      <div class="msg" id="msgCle" role="alert"></div>
+    </form>
+  </section>
+
+  <section id="tableau" class="hidden">
+    <div class="barre">
+      <div class="mois">
+        <button class="ghost petit" id="moisAvant" type="button" aria-label="Mois précédent">‹</button>
+        <b id="moisNom"></b>
+        <button class="ghost petit" id="moisApres" type="button" aria-label="Mois suivant">›</button>
+      </div>
+      <div class="actions">
+        <button class="ghost petit" id="actualiser" type="button">Actualiser</button>
+        <button class="ghost petit" id="exporter" type="button">Exporter (Excel)</button>
+      </div>
+    </div>
+
+    <div class="chiffres">
+      <div class="card"><small>Ventes du mois</small><strong id="cVentes">–</strong></div>
+      <div class="card"><small>Nouveaux clients (agents)</small><strong id="cNouveaux">–</strong></div>
+      <div class="card"><small>Renouvellements (agents)</small><strong id="cRenouv">–</strong></div>
+      <div class="card"><small>Commissions dues</small><strong id="cDues">–</strong></div>
+      <div class="card"><small>Déjà versé</small><strong id="cVerse">–</strong></div>
+    </div>
+    <div class="taux" id="taux"></div>
+    <div class="msg" id="msgTab" role="alert"></div>
+
+    <h2>Agents</h2>
+    <div class="agents" id="agents"></div>
+    <p id="sansAgent" style="margin-top:12px"></p>
+
+    <h2>Ajouter ou modifier un agent</h2>
+    <form class="card ajout" id="formAgent">
+      <div><label for="aCode">Code</label><input id="aCode" placeholder="AG-07" required maxlength="40"></div>
+      <div><label for="aNom">Nom et prénom</label><input id="aNom" placeholder="Moussa Diarra" required maxlength="80"></div>
+      <div><label for="aTel">Téléphone (WhatsApp)</label><input id="aTel" placeholder="76 00 00 00" inputmode="tel" maxlength="30"></div>
+      <div><button type="submit" style="width:100%; justify-content:center">Enregistrer l'agent</button></div>
+      <div class="msg" id="msgAgent" role="alert" style="grid-column:1 / -1"></div>
+    </form>
+  </section>
+</main>
+
+<script>
+(function () {
+  var API = 'https://vcwwvolnyndmygshpvrf.supabase.co/functions/v1/paiement-licence';
+  var SITE = location.origin + location.pathname.replace(/agents\.html$/, '');
+  var $ = function (id) { return document.getElementById(id); };
+  var fcfa = function (n) { return Math.round(n || 0).toLocaleString('fr-FR').replace(/ | /g, ' ') + ' FCFA'; };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* */ } } };
+  var CLE = store.get('tm_admin_cle') || '';
+  var MOIS = new Date().toISOString().slice(0, 7);
+  var DONNEES = null;
+
+  function appel(chemin, corps) {
+    return fetch(API + chemin, { method: corps ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json', 'x-admin-key': CLE }, body: corps ? JSON.stringify(corps) : undefined })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error(j.message || ('Erreur ' + r.status)); e.status = r.status; throw e; } return j; }); });
+  }
+  function msg(id, cls, t) { $(id).className = 'msg ' + cls; $(id).textContent = t || ''; }
+  function nomMois(m) { var d = new Date(m + '-15T12:00:00Z'); return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' }); }
+  function decaler(m, n) { var d = new Date(m + '-15T12:00:00Z'); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); }
+  function telIntl(t) { var c = String(t || '').replace(/\D/g, ''); if (!c) return ''; return c.length === 8 ? '223' + c : c.replace(/^00/, ''); }
+  function lienAgent(code) { return SITE + '?agent=' + encodeURIComponent(code); }
+
+  function charger() {
+    $('moisNom').textContent = nomMois(MOIS);
+    $('moisApres').disabled = MOIS >= new Date().toISOString().slice(0, 7);
+    msg('msgTab', '', 'Chargement…');
+    return appel('/admin/agents?mois=' + MOIS).then(function (j) {
+      DONNEES = j; msg('msgTab', '', ''); afficher(j);
+    }).catch(function (e) {
+      if (e.status === 401 || e.status === 503) { deconnecter(); msg('msgCle', 'err', e.message); return; }
+      msg('msgTab', 'err', e.message || 'Impossible de charger les données. Vérifiez la connexion Internet.');
+    });
+  }
+
+  function afficher(j) {
+    var t = j.totaux;
+    $('cVentes').textContent = fcfa(t.chiffre);
+    $('cNouveaux').textContent = t.nouveaux;
+    $('cRenouv').textContent = t.renouvellements;
+    $('cDues').textContent = fcfa(t.commissions);
+    $('cVerse').textContent = fcfa(t.deja_verse);
+    $('taux').textContent = 'Règle : ' + j.taux.nouveau + ' % sur le 1er paiement d\'un nouveau client, ' + j.taux.renouvellement + ' % sur ses renouvellements pendant ' + j.taux.duree_mois + ' mois'
+      + (j.taux.primes.length ? ' · primes : ' + j.taux.primes.map(function (p) { return p.seuil + ' nouveaux = ' + fcfa(p.montant); }).join(', ') : '') + '.';
+    var s = j.sans_agent;
+    $('sansAgent').textContent = s.nombre ? s.nombre + ' vente' + (s.nombre > 1 ? 's' : '') + ' sans agent ce mois-ci (' + fcfa(s.montant) + ').' : '';
+    if (!j.agents.length) { $('agents').innerHTML = '<div class="card vide">Aucun agent pour l\'instant. Ajoutez-en un ci-dessous : il recevra son lien personnel.</div>'; return; }
+    $('agents').innerHTML = j.agents.map(function (a, i) {
+      var etat = a.paye ? '<span class="paye">Versé ' + fcfa(a.paye.montant) + ' le ' + new Date(a.paye.paye_le).toLocaleDateString('fr-FR') + '</span> <button class="ghost petit" type="button" data-annuler="' + i + '">Annuler</button>'
+        : (a.total > 0 ? '<button class="petit" type="button" data-payer="' + i + '">Marquer comme versé</button>' : '');
+      var ventes = a.ventes.length ? '<div class="tableau hidden" id="v' + i + '"><table><thead><tr><th>Date</th><th>Client</th><th>Formule</th><th>Type</th><th class="n">Montant</th><th class="n">Commission</th></tr></thead><tbody>'
+        + a.ventes.map(function (v) { return '<tr><td>' + new Date(v.date).toLocaleDateString('fr-FR') + '</td><td>' + esc(v.client) + (v.telephone ? '<br><small>' + esc(v.telephone) + '</small>' : '') + '</td><td>' + esc(v.offre || '') + '</td><td>' + (v.type === 'nouveau' ? 'Nouveau' : 'Renouvellement') + ' · ' + v.taux + ' %</td><td class="n">' + fcfa(v.montant) + '</td><td class="n">' + fcfa(v.commission) + '</td></tr>'; }).join('')
+        + '</tbody></table></div>' : '';
+      return '<article class="card agent">'
+        + '<div class="haut"><div><div class="nom">' + esc(a.nom || 'Agent non enregistré') + '</div><span class="code">' + esc(a.code) + '</span>'
+        + (a.connu ? '' : ' <span class="inconnu">Code inconnu : enregistrez-le ci-dessous</span>') + (a.telephone ? ' <small style="color:var(--muted)">' + esc(a.telephone) + '</small>' : '') + '</div>'
+        + '<div class="total"><strong>' + fcfa(a.total) + '</strong><small>à verser' + (a.prime ? ' (dont prime ' + fcfa(a.prime) + ')' : '') + '</small></div></div>'
+        + '<div class="stats"><span><b>' + a.nouveaux + '</b> nouveau' + (a.nouveaux > 1 ? 'x' : '') + ' client' + (a.nouveaux > 1 ? 's' : '') + '</span><span><b>' + a.renouvellements + '</b> renouvellement' + (a.renouvellements > 1 ? 's' : '') + '</span><span>Ventes : <b>' + fcfa(a.chiffre) + '</b></span><span>Commission : <b>' + fcfa(a.commission) + '</b></span></div>'
+        + '<div class="actions">' + etat
+        + (a.ventes.length ? '<button class="ghost petit" type="button" data-voir="' + i + '">Voir les ventes</button>' : '')
+        + '<button class="ghost petit" type="button" data-copier="' + i + '">Copier son lien</button>'
+        + (a.telephone ? '<a class="btn ghost petit" target="_blank" rel="noopener" href="https://wa.me/' + telIntl(a.telephone) + '?text=' + encodeURIComponent('Bonjour ' + (a.nom || '') + ', voici ton lien TRA-MANAGER à partager avec tes clients : ' + lienAgent(a.code) + '\nTon code agent : ' + a.code) + '">Envoyer son lien (WhatsApp)</a>' : '')
+        + '</div>' + ventes + '</article>';
+    }).join('');
+  }
+
+  $('agents').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b || !DONNEES) return;
+    var a;
+    if (b.hasAttribute('data-voir')) { var v = $('v' + b.getAttribute('data-voir')); v.classList.toggle('hidden'); b.textContent = v.classList.contains('hidden') ? 'Voir les ventes' : 'Masquer les ventes'; return; }
+    if (b.hasAttribute('data-copier')) {
+      a = DONNEES.agents[+b.getAttribute('data-copier')];
+      var l = lienAgent(a.code);
+      (navigator.clipboard ? navigator.clipboard.writeText(l) : Promise.reject()).then(function () { b.textContent = 'Lien copié ✓'; setTimeout(function () { b.textContent = 'Copier son lien'; }, 2000); }, function () { prompt('Lien de l\'agent :', l); });
+      return;
+    }
+    if (b.hasAttribute('data-payer')) {
+      a = DONNEES.agents[+b.getAttribute('data-payer')];
+      var montant = prompt('Montant versé à ' + (a.nom || a.code) + ' pour ' + nomMois(DONNEES.mois) + ' (FCFA) :', String(a.total));
+      if (montant == null) return;
+      var note = prompt('Note (facultatif, ex. référence du transfert Orange Money) :', '') || '';
+      b.disabled = true;
+      appel('/admin/commission', { agent: a.code, mois: DONNEES.mois, montant: Number(String(montant).replace(/\D/g, '')), note: note }).then(charger).catch(function (er) { msg('msgTab', 'err', er.message); b.disabled = false; });
+      return;
+    }
+    if (b.hasAttribute('data-annuler')) {
+      a = DONNEES.agents[+b.getAttribute('data-annuler')];
+      if (!confirm('Annuler le versement enregistré pour ' + (a.nom || a.code) + ' ?')) return;
+      appel('/admin/commission', { agent: a.code, mois: DONNEES.mois, annuler: true }).then(charger).catch(function (er) { msg('msgTab', 'err', er.message); });
+    }
+  });
+
+  $('formCle').addEventListener('submit', function (e) {
+    e.preventDefault();
+    CLE = $('cle').value.trim();
+    store.set('tm_admin_cle', $('retenir').checked ? CLE : null);
+    msg('msgCle', '', 'Vérification…');
+    appel('/admin/agents?mois=' + MOIS).then(function (j) {
+      msg('msgCle', '', ''); $('connexion').classList.add('hidden'); $('tableau').classList.remove('hidden'); $('sortir').classList.remove('hidden');
+      DONNEES = j; $('moisNom').textContent = nomMois(MOIS); $('moisApres').disabled = true; afficher(j);
+    }).catch(function (er) { msg('msgCle', 'err', er.message || 'Connexion impossible.'); });
+  });
+  function deconnecter() { CLE = ''; store.set('tm_admin_cle', null); $('tableau').classList.add('hidden'); $('sortir').classList.add('hidden'); $('connexion').classList.remove('hidden'); $('cle').value = ''; }
+  $('sortir').onclick = deconnecter;
+  $('moisAvant').onclick = function () { MOIS = decaler(MOIS, -1); charger(); };
+  $('moisApres').onclick = function () { MOIS = decaler(MOIS, 1); charger(); };
+  $('actualiser').onclick = charger;
+
+  $('formAgent').addEventListener('submit', function (e) {
+    e.preventDefault();
+    msg('msgAgent', '', 'Enregistrement…');
+    appel('/admin/agent', { code: $('aCode').value, nom: $('aNom').value, telephone: $('aTel').value }).then(function (j) {
+      msg('msgAgent', 'ok', 'Agent ' + j.agent.code + ' enregistré. Son lien : ' + lienAgent(j.agent.code));
+      $('formAgent').reset(); charger();
+    }).catch(function (er) { msg('msgAgent', 'err', er.message); });
+  });
+
+  $('exporter').onclick = function () {
+    if (!DONNEES) return;
+    var lignes = [['Mois', 'Code agent', 'Agent', 'Téléphone agent', 'Date', 'Client', 'Téléphone client', 'Formule', 'Type', 'Taux %', 'Montant FCFA', 'Commission FCFA']];
+    DONNEES.agents.forEach(function (a) {
+      a.ventes.forEach(function (v) { lignes.push([DONNEES.mois, a.code, a.nom || '', a.telephone || '', v.date.slice(0, 10), v.client, v.telephone || '', v.offre || '', v.type, v.taux, v.montant, v.commission]); });
+      if (a.prime) lignes.push([DONNEES.mois, a.code, a.nom || '', a.telephone || '', '', 'PRIME DU MOIS', '', '', 'prime', '', '', a.prime]);
+    });
+    var csv = '﻿' + lignes.map(function (l) { return l.map(function (c) { c = String(c); return /[;"\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(';'); }).join('\r\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'commissions-agents-' + DONNEES.mois + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  if (CLE) { $('cle').value = CLE; $('retenir').checked = true; $('formCle').dispatchEvent(new Event('submit', { cancelable: true })); }
+})();
+</script>
+</body>
+</html>

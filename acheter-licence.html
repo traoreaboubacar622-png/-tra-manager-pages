@@ -205,6 +205,12 @@
       })
       .catch(function (e) { message('msgAchat', 'err', e.message || 'Paiement impossible pour le moment.'); majBouton(); });
   };
+  // Retour avec le bouton « Précédent » (page restaurée par le navigateur) : on va directement au suivi du paiement
+  window.addEventListener('pageshow', function (ev) {
+    if (!ev.persisted || /[?&]t=/.test(location.search)) return;
+    var d = null; try { d = JSON.parse(store.get('tm-dernier-paiement') || 'null'); } catch (e) { d = null; }
+    if (d && d.t) location.replace('?t=' + encodeURIComponent(d.t) + '&c=' + encodeURIComponent(d.c));
+  });
   var dernier = null; try { dernier = JSON.parse(store.get('tm-dernier-paiement') || 'null'); } catch (e) { dernier = null; }
   if (dernier && dernier.t) { $('dernier').classList.remove('hidden'); $('lienDernier').href = '?t=' + encodeURIComponent(dernier.t) + '&c=' + encodeURIComponent(dernier.c); }
 

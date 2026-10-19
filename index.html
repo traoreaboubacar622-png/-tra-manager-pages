@@ -85,6 +85,9 @@
   .dl .carte p { margin-bottom:16px; }
   .os { display:flex; align-items:center; gap:12px; margin-bottom:4px; }
   .os svg { width:34px; height:34px; flex:none; }
+  .badge-play { display:inline-block; margin-left:-10px; }
+  .badge-play img { display:block; height:62px; width:auto; }
+  .aide-dl { font-size:14px; margin:12px 0 0 !important; flex:0 !important; }
 
   /* Questions */
   details { background:#fff; border:1px solid var(--line); border-radius:14px; padding:0 18px; margin-bottom:10px; }
@@ -186,27 +189,29 @@
 <section id="telecharger" class="gris">
   <div class="in">
     <h2>Télécharger</h2>
-    <p class="sous">La même application, sur votre téléphone et sur l'ordinateur de la boutique.</p>
+    <p class="sous">La même application, sur votre téléphone et sur l'ordinateur de la boutique. 15 jours d'essai gratuit.</p>
     <div class="dl">
       <div class="carte">
         <div class="os">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#3ddc84" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg>
           <h3 style="margin:0">Téléphone Android</h3>
         </div>
-        <p>Sur Google Play. Fonctionne hors ligne, imprime les reçus en Bluetooth.</p>
-        <a class="btn btn-blue" href="https://play.google.com/store/apps/details?id=ml.tramanager.app" target="_blank" rel="noopener">Ouvrir Google Play</a>
+        <p>Fonctionne hors ligne, imprime les reçus en Bluetooth.</p>
+        <a class="badge-play" href="https://play.google.com/store/apps/details?id=ml.tramanager.app" target="_blank" rel="noopener">
+          <img src="https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png" alt="Disponible sur Google Play" width="646" height="250">
+        </a>
       </div>
       <div class="carte">
         <div class="os">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0078d4" d="M2 4.6l8.2-1.1v7.9H2zm9.2-1.3L22 1.8v9.6H11.2zM2 12.4h8.2v7.9L2 19.2zm9.2 0H22V22l-10.8-1.5z"/></svg>
-          <h3 style="margin:0">Ordinateur Windows</h3>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <h3 style="margin:0">Version ordinateur</h3>
         </div>
-        <p>Pour la caisse principale. Plusieurs postes peuvent travailler ensemble dans la boutique.</p>
-        <a class="btn btn-line" target="_blank" rel="noopener"
-           href="https://wa.me/22392155870?text=Bonjour%2C%20je%20veux%20installer%20TRA-MANAGER%20sur%20mon%20ordinateur%20Windows.">
-          <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="#25d366" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
-          Demander l'installateur
+        <p>Windows 10 ou 11. Pour la caisse principale : plusieurs postes peuvent travailler ensemble dans la boutique.</p>
+        <a class="btn btn-blue" href="https://github.com/traoreaboubacar622-png/-tra-manager-pages/releases/latest/download/TRA-MANAGER-Setup.exe">
+          <svg class="wa" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>
+          Télécharger pour Windows
         </a>
+        <p class="aide-dl">Besoin d'aide pour l'installer ? <a href="https://wa.me/22392155870?text=Bonjour%2C%20je%20veux%20installer%20TRA-MANAGER%20sur%20mon%20ordinateur." target="_blank" rel="noopener">Écrivez-nous</a>.</p>
       </div>
     </div>
   </div>
@@ -240,7 +245,7 @@
       </div>
       <div class="cta">
         <a class="btn btn-amber" href="https://wa.me/22392155870" target="_blank" rel="noopener">
-          <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
+          <svg class="wa" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5A8 8 0 1 1 21 12z"/></svg>
           WhatsApp
         </a>
         <a class="btn btn-ghost" href="tel:+22392832692">Appeler</a>
