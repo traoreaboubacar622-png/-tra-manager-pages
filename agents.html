@@ -324,8 +324,10 @@
   };
   $('smsTest').onclick = function () {
     var t = prompt('Numéro qui reçoit le SMS de test (8 chiffres) :', ''); if (!t) return;
+    var m = prompt('Quel SMS ? 1 = Bienvenue, 2 = Rappel de fin de licence, 3 = Merci après achat', '1'); if (m == null) return;
+    var modele = { '2': 'rappel', '3': 'achat' }[String(m).trim()] || 'bienvenue';
     msg('msgSms', '', 'Envoi du SMS de test…');
-    appel('/admin/rappels', { action: 'test', telephone: t }).then(function () { msg('msgSms', 'ok', 'SMS de test envoyé au ' + t + '.'); }).catch(function (e) { msg('msgSms', 'err', e.message); });
+    appel('/admin/rappels', { action: 'test', telephone: t, modele: modele }).then(function () { msg('msgSms', 'ok', 'SMS de test envoyé au ' + t + '.'); }).catch(function (e) { msg('msgSms', 'err', e.message); });
   };
 
   $('exporter').onclick = function () {
