@@ -62,6 +62,8 @@
   .retraits { display:grid; gap:10px; }
   .retrait { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; border-left:5px solid var(--amber); }
   .retrait strong { font-size:20px; }
+  .etat { display:inline-block; border-radius:999px; padding:2px 9px; font-size:13px; font-weight:700; }
+  .e-ok { background:var(--green-bg); color:var(--green); } .e-ko { background:#fee2e2; color:var(--red); } .e-att { background:#fef3c7; color:#92400e; }
   .pin-ok { background:var(--green-bg); color:var(--green); border-radius:6px; padding:1px 7px; font-size:13px; font-weight:700; }
   .pin-non { background:#f1f5f9; color:var(--muted); border-radius:6px; padding:1px 7px; font-size:13px; font-weight:700; }
 </style>
@@ -126,6 +128,22 @@
       <p style="grid-column:1 / -1; font-size:14px">Le PIN permet à l'agent d'ouvrir son espace (tra-manager.com/agent.html). Laissez vide pour garder le PIN actuel. Retraits payés au numéro ci-dessus uniquement.</p>
       <div class="msg" id="msgAgent" role="alert" style="grid-column:1 / -1"></div>
     </form>
+
+    <h2>Rappels SMS de fin de licence</h2>
+    <div class="card" id="sms">
+      <div class="barre" style="margin-bottom:6px">
+        <div id="smsEtat">Chargement…</div>
+        <div class="actions">
+          <button class="petit" id="smsLancer" type="button">Envoyer les rappels du jour</button>
+          <button class="ghost petit" id="smsTest" type="button">SMS de test</button>
+        </div>
+      </div>
+      <p style="font-size:14px">Nouveau client : SMS de bienvenue, puis rappel 3 jours avant la fin de l'essai. Après chaque paiement : SMS de confirmation. Puis un SMS 7 jours avant la fin de sa licence, la veille, puis 2 jours après. Le lien du SMS ouvre la page d'achat déjà remplie.</p>
+      <p id="smsInst" style="font-size:15px"></p>
+      <div class="msg" id="msgSms" role="alert"></div>
+      <div id="smsDus"></div>
+      <div class="tableau" id="smsHist"></div>
+    </div>
   </section>
 </main>
 
@@ -258,14 +276,14 @@
     msg('msgCle', '', 'Vérification…');
     appel('/admin/agents?mois=' + MOIS).then(function (j) {
       msg('msgCle', '', ''); $('connexion').classList.add('hidden'); $('tableau').classList.remove('hidden'); $('sortir').classList.remove('hidden');
-      DONNEES = j; $('moisNom').textContent = nomMois(MOIS); $('moisApres').disabled = true; afficher(j);
+      DONNEES = j; $('moisNom').textContent = nomMois(MOIS); $('moisApres').disabled = true; afficher(j); chargerSms();
     }).catch(function (er) { msg('msgCle', 'err', er.message || 'Connexion impossible.'); });
   });
   function deconnecter() { CLE = ''; store.set('tm_admin_cle', null); $('tableau').classList.add('hidden'); $('sortir').classList.add('hidden'); $('connexion').classList.remove('hidden'); $('cle').value = ''; }
   $('sortir').onclick = deconnecter;
   $('moisAvant').onclick = function () { MOIS = decaler(MOIS, -1); charger(); };
   $('moisApres').onclick = function () { MOIS = decaler(MOIS, 1); charger(); };
-  $('actualiser').onclick = charger;
+  $('actualiser').onclick = function () { charger(); chargerSms(); };
 
   $('formAgent').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -276,6 +294,39 @@
       $('formAgent').reset(); charger();
     }).catch(function (er) { msg('msgAgent', 'err', er.message); });
   });
+
+  // ---- Rappels SMS
+  var ETAPE = { 'J-7': '7 jours avant', 'J-1': 'Veille', 'J+2': 'Après la fin', 'ACHAT': 'Merci (achat)', 'BIENVENUE': 'Bienvenue', 'ESSAI': 'Fin d\'essai' };
+  function chargerSms() {
+    return appel('/admin/rappels').then(function (j) {
+      var solde = (j.solde || []).map(function (x) { return x.pays + ' : ' + x.solde; }).join(', ');
+      $('smsEtat').innerHTML = !j.configure ? '<span class="etat e-att">Non configuré</span> ajoutez AFRIKSMS_CLIENT_ID et AFRIKSMS_API_KEY dans Supabase'
+        : '<span class="etat e-ok">Actif</span> expéditeur <b>' + esc(j.expediteur) + '</b>' + (solde ? ' · crédit AfrikSMS : <b>' + esc(solde) + '</b>' : '')
+          + (j.automatique ? ' · envoi automatique chaque matin' : ' · <span class="etat e-att">envoi automatique non programmé</span>');
+      $('smsLancer').disabled = $('smsTest').disabled = !j.configure;
+      var I = j.installations;
+      $('smsInst').innerHTML = I && I.total ? '<b>' + I.total + '</b> installation' + (I.total > 1 ? 's' : '') + ' inscrite' + (I.total > 1 ? 's' : '') + ' (' + I.android + ' Android, ' + I.windows + ' Windows) · <b>' + I.semaine + '</b> cette semaine · <b>' + I.payantes + '</b> avec licence payée'
+        : 'Installations inscrites : aucune pour l\'instant (à partir de la version 1.16 de l\'application).';
+      $('smsDus').innerHTML = j.a_envoyer.length ? '<p><b>' + j.a_envoyer.length + ' SMS à envoyer aujourd\'hui</b> : ' + j.a_envoyer.slice(0, 8).map(function (d) { return esc(d.client) + ' (' + ETAPE[d.etape] + ')'; }).join(', ') + (j.a_envoyer.length > 8 ? '…' : '') + '</p>' : '<p>Aucun SMS à envoyer aujourd\'hui.</p>';
+      var H = j.historique || [];
+      $('smsHist').innerHTML = H.length ? '<table><thead><tr><th>Date</th><th>Client</th><th>Numéro</th><th>SMS</th><th>Fin licence</th><th>État</th></tr></thead><tbody>' + H.slice(0, 30).map(function (r) {
+        var e = r.statut === 'ENVOYE' ? '<span class="etat e-ok">Envoyé</span>' : r.statut === 'ECHEC' ? '<span class="etat e-ko" title="' + esc(r.erreur) + '">Échec</span>' : '<span class="etat e-att">En cours</span>';
+        return '<tr><td>' + new Date(r.envoye_le || r.cree_le).toLocaleDateString('fr-FR') + '</td><td>' + esc(r.client) + '</td><td>' + esc(r.telephone) + '</td><td>' + (ETAPE[r.etape] || r.etape) + '</td><td>' + new Date(r.expires).toLocaleDateString('fr-FR') + '</td><td>' + e + (r.erreur ? '<br><small>' + esc(r.erreur) + '</small>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table>' : '';
+    }).catch(function (e) { $('smsEtat').textContent = ''; msg('msgSms', 'err', e.message); });
+  }
+  $('smsLancer').onclick = function () {
+    $('smsLancer').disabled = true; msg('msgSms', '', 'Envoi en cours…');
+    appel('/admin/rappels', { action: 'lancer' }).then(function (j) {
+      msg('msgSms', j.echecs ? 'err' : 'ok', j.envoyes + ' SMS envoyé' + (j.envoyes > 1 ? 's' : '') + (j.echecs ? ', ' + j.echecs + ' échec(s) : voir le tableau' : '') + '.');
+      chargerSms();
+    }).catch(function (e) { msg('msgSms', 'err', e.message); $('smsLancer').disabled = false; });
+  };
+  $('smsTest').onclick = function () {
+    var t = prompt('Numéro qui reçoit le SMS de test (8 chiffres) :', ''); if (!t) return;
+    msg('msgSms', '', 'Envoi du SMS de test…');
+    appel('/admin/rappels', { action: 'test', telephone: t }).then(function () { msg('msgSms', 'ok', 'SMS de test envoyé au ' + t + '.'); }).catch(function (e) { msg('msgSms', 'err', e.message); });
+  };
 
   $('exporter').onclick = function () {
     if (!DONNEES) return;

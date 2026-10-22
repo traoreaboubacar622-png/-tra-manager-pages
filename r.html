@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Renouveler ma licence TRA-MANAGER</title>
+<script>
+  // Lien court des SMS de rappel : r.html?c=CODE_MACHINE&n=Nom → page d'achat pré-remplie
+  (function () {
+    var q = new URLSearchParams(location.search), d = new URLSearchParams();
+    if (q.get('c')) d.set('code', q.get('c'));
+    if (q.get('n')) d.set('nom', q.get('n'));
+    if (q.get('agent')) d.set('agent', q.get('agent'));
+    location.replace('acheter-licence.html' + (String(d) ? '?' + d : ''));
+  })();
+</script>
+</head>
+<body style="font-family:system-ui,sans-serif;padding:24px">
+  <p><a href="acheter-licence.html">Renouveler ma licence TRA-MANAGER</a></p>
+</body>
+</html>
