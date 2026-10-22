@@ -59,6 +59,11 @@
   .ajout { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap:0 12px; align-items:end; }
   .ajout button { margin-top:10px; height:46px; }
   .vide { text-align:center; padding:28px 16px; color:var(--muted); }
+  .retraits { display:grid; gap:10px; }
+  .retrait { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; border-left:5px solid var(--amber); }
+  .retrait strong { font-size:20px; }
+  .pin-ok { background:var(--green-bg); color:var(--green); border-radius:6px; padding:1px 7px; font-size:13px; font-weight:700; }
+  .pin-non { background:#f1f5f9; color:var(--muted); border-radius:6px; padding:1px 7px; font-size:13px; font-weight:700; }
 </style>
 </head>
 <body>
@@ -101,6 +106,12 @@
     <div class="taux" id="taux"></div>
     <div class="msg" id="msgTab" role="alert"></div>
 
+    <section id="blocRetraits" class="hidden">
+      <h2>Demandes de retrait à payer</h2>
+      <p>Envoyez le montant par Orange Money au numéro indiqué, puis cliquez sur « Versé ».</p>
+      <div class="retraits" id="retraits"></div>
+    </section>
+
     <h2>Agents</h2>
     <div class="agents" id="agents"></div>
     <p id="sansAgent" style="margin-top:12px"></p>
@@ -109,8 +120,10 @@
     <form class="card ajout" id="formAgent">
       <div><label for="aCode">Code</label><input id="aCode" placeholder="AG-07" required maxlength="40"></div>
       <div><label for="aNom">Nom et prénom</label><input id="aNom" placeholder="Moussa Diarra" required maxlength="80"></div>
-      <div><label for="aTel">Téléphone (WhatsApp)</label><input id="aTel" placeholder="76 00 00 00" inputmode="tel" maxlength="30"></div>
+      <div><label for="aTel">Téléphone Orange Money</label><input id="aTel" placeholder="76 00 00 00" inputmode="tel" maxlength="30"></div>
+      <div><label for="aPin">PIN de l'espace agent</label><input id="aPin" placeholder="4 à 6 chiffres" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="off"></div>
       <div><button type="submit" style="width:100%; justify-content:center">Enregistrer l'agent</button></div>
+      <p style="grid-column:1 / -1; font-size:14px">Le PIN permet à l'agent d'ouvrir son espace (tra-manager.com/agent.html). Laissez vide pour garder le PIN actuel. Retraits payés au numéro ci-dessus uniquement.</p>
       <div class="msg" id="msgAgent" role="alert" style="grid-column:1 / -1"></div>
     </form>
   </section>
@@ -159,6 +172,14 @@
     $('cVerse').textContent = fcfa(t.deja_verse);
     $('taux').textContent = 'Règle : ' + j.taux.nouveau + ' % sur le 1er paiement d\'un nouveau client, ' + j.taux.renouvellement + ' % sur ses renouvellements pendant ' + j.taux.duree_mois + ' mois'
       + (j.taux.primes.length ? ' · primes : ' + j.taux.primes.map(function (p) { return p.seuil + ' nouveaux = ' + fcfa(p.montant); }).join(', ') : '') + '.';
+    var R = j.retraits_en_attente || [];
+    $('blocRetraits').classList.toggle('hidden', !R.length);
+    $('retraits').innerHTML = R.map(function (r, i) {
+      var ag = (j.agents.filter(function (a) { return a.code === r.agent; })[0] || {});
+      return '<article class="card retrait"><div><strong>' + fcfa(r.montant) + '</strong><div>' + esc(ag.nom || r.agent) + ' <span class="code" style="font-family:ui-monospace,Consolas,monospace">' + esc(r.agent) + '</span></div>'
+        + '<div>Orange Money : <b>' + esc(r.telephone) + '</b> · demandé le ' + new Date(r.demande_le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + '</div></div>'
+        + '<div class="actions"><button class="petit" type="button" data-rpayer="' + i + '">Versé</button><button class="ghost petit" type="button" data-rrefuser="' + i + '">Refuser</button></div></article>';
+    }).join('');
     var s = j.sans_agent;
     $('sansAgent').textContent = s.nombre ? s.nombre + ' vente' + (s.nombre > 1 ? 's' : '') + ' sans agent ce mois-ci (' + fcfa(s.montant) + ').' : '';
     if (!j.agents.length) { $('agents').innerHTML = '<div class="card vide">Aucun agent pour l\'instant. Ajoutez-en un ci-dessous : il recevra son lien personnel.</div>'; return; }
@@ -170,16 +191,33 @@
         + '</tbody></table></div>' : '';
       return '<article class="card agent">'
         + '<div class="haut"><div><div class="nom">' + esc(a.nom || 'Agent non enregistré') + '</div><span class="code">' + esc(a.code) + '</span>'
-        + (a.connu ? '' : ' <span class="inconnu">Code inconnu : enregistrez-le ci-dessous</span>') + (a.telephone ? ' <small style="color:var(--muted)">' + esc(a.telephone) + '</small>' : '') + '</div>'
+        + (a.connu ? (a.pin ? ' <span class="pin-ok">Espace agent actif</span>' : ' <span class="pin-non">Sans PIN</span>') : ' <span class="inconnu">Code inconnu : enregistrez-le ci-dessous</span>') + (a.telephone ? ' <small style="color:var(--muted)">' + esc(a.telephone) + '</small>' : '') + '</div>'
         + '<div class="total"><strong>' + fcfa(a.total) + '</strong><small>à verser' + (a.prime ? ' (dont prime ' + fcfa(a.prime) + ')' : '') + '</small></div></div>'
         + '<div class="stats"><span><b>' + a.nouveaux + '</b> nouveau' + (a.nouveaux > 1 ? 'x' : '') + ' client' + (a.nouveaux > 1 ? 's' : '') + '</span><span><b>' + a.renouvellements + '</b> renouvellement' + (a.renouvellements > 1 ? 's' : '') + '</span><span>Ventes : <b>' + fcfa(a.chiffre) + '</b></span><span>Commission : <b>' + fcfa(a.commission) + '</b></span></div>'
         + '<div class="actions">' + etat
         + (a.ventes.length ? '<button class="ghost petit" type="button" data-voir="' + i + '">Voir les ventes</button>' : '')
         + '<button class="ghost petit" type="button" data-copier="' + i + '">Copier son lien</button>'
+        + (a.connu ? '<button class="ghost petit" type="button" data-modifier="' + i + '">Modifier / PIN</button>' : '')
         + (a.telephone ? '<a class="btn ghost petit" target="_blank" rel="noopener" href="https://wa.me/' + telIntl(a.telephone) + '?text=' + encodeURIComponent('Bonjour ' + (a.nom || '') + ', voici ton lien TRA-MANAGER à partager avec tes clients : ' + lienAgent(a.code) + '\nTon code agent : ' + a.code) + '">Envoyer son lien (WhatsApp)</a>' : '')
         + '</div>' + ventes + '</article>';
     }).join('');
   }
+
+  $('retraits').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b || !DONNEES) return;
+    var payer = b.hasAttribute('data-rpayer');
+    var r = DONNEES.retraits_en_attente[+b.getAttribute(payer ? 'data-rpayer' : 'data-rrefuser')];
+    var note;
+    if (payer) {
+      if (!confirm('Confirmez : vous avez envoyé ' + fcfa(r.montant) + ' par Orange Money au ' + r.telephone + ' ?')) return;
+      note = prompt('Référence du transfert Orange Money (facultatif) :', '') || '';
+    } else {
+      note = prompt('Motif du refus (l\'agent le verra) :', '');
+      if (note == null) return;
+    }
+    b.disabled = true;
+    appel('/admin/retrait', { id: r.id, action: payer ? 'payer' : 'refuser', note: note }).then(charger).catch(function (er) { msg('msgTab', 'err', er.message); b.disabled = false; });
+  });
 
   $('agents').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b || !DONNEES) return;
@@ -189,6 +227,12 @@
       a = DONNEES.agents[+b.getAttribute('data-copier')];
       var l = lienAgent(a.code);
       (navigator.clipboard ? navigator.clipboard.writeText(l) : Promise.reject()).then(function () { b.textContent = 'Lien copié ✓'; setTimeout(function () { b.textContent = 'Copier son lien'; }, 2000); }, function () { prompt('Lien de l\'agent :', l); });
+      return;
+    }
+    if (b.hasAttribute('data-modifier')) {
+      a = DONNEES.agents[+b.getAttribute('data-modifier')];
+      $('aCode').value = a.code; $('aNom').value = a.nom || ''; $('aTel').value = a.telephone || ''; $('aPin').value = '';
+      $('formAgent').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('aPin').focus();
       return;
     }
     if (b.hasAttribute('data-payer')) {
@@ -226,8 +270,9 @@
   $('formAgent').addEventListener('submit', function (e) {
     e.preventDefault();
     msg('msgAgent', '', 'Enregistrement…');
-    appel('/admin/agent', { code: $('aCode').value, nom: $('aNom').value, telephone: $('aTel').value }).then(function (j) {
-      msg('msgAgent', 'ok', 'Agent ' + j.agent.code + ' enregistré. Son lien : ' + lienAgent(j.agent.code));
+    var pin = $('aPin').value.trim();
+    appel('/admin/agent', { code: $('aCode').value, nom: $('aNom').value, telephone: $('aTel').value, pin: pin }).then(function (j) {
+      msg('msgAgent', 'ok', 'Agent ' + j.agent.code + ' enregistré' + (pin ? ' avec son PIN. Donnez-lui le PIN de vive voix, puis son espace : ' + SITE + 'agent.html' : '. Son lien : ' + lienAgent(j.agent.code)));
       $('formAgent').reset(); charger();
     }).catch(function (er) { msg('msgAgent', 'err', er.message); });
   });

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1b3d">
+<title>Espace agent TRA-MANAGER</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+  :root { --navy:#0f1b3d; --blue:#2563eb; --blue-d:#1d4ed8; --amber:#f5b400; --green:#047857; --green-bg:#dcfce7; --red:#b91c1c; --red-bg:#fee2e2; --ink:#111827; --muted:#4b5563; --line:#e5e7eb; --bg:#f3f5f9; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--navy); color:#fff; padding:14px 16px; }
+  header .in, main { max-width:720px; margin:0 auto; }
+  header .in { display:flex; align-items:center; gap:12px; }
+  header img { width:40px; height:40px; }
+  header b { font-size:19px; display:block; line-height:1.15; }
+  header span { color:var(--amber); font-size:13px; font-weight:600; }
+  header .sortir { margin-left:auto; white-space:nowrap; }
+  main { padding:18px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:17px; margin:26px 0 10px; }
+  p { margin:6px 0; color:var(--muted); }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  input { width:100%; font:inherit; font-size:18px; padding:12px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; }
+  input:focus { outline:2px solid var(--blue); outline-offset:1px; }
+  #pin { letter-spacing:8px; font-family:ui-monospace,Consolas,monospace; }
+  button, .btn { font:inherit; font-weight:700; border:0; border-radius:10px; padding:11px 14px; cursor:pointer; background:var(--blue); color:#fff; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+  button:hover, .btn:hover { background:var(--blue-d); }
+  button:disabled { opacity:.55; cursor:not-allowed; }
+  .ghost { background:#fff; color:var(--navy); border:1px solid #cbd5e1; }
+  .ghost:hover { background:#f1f5f9; }
+  .petit { padding:7px 10px; font-size:14px; }
+  header .ghost { background:transparent; color:#fff; border-color:rgba(255,255,255,.35); }
+  .hidden { display:none !important; }
+  .msg { margin-top:10px; font-size:15px; } .msg.err { color:var(--red); } .msg.ok { color:var(--green); }
+  .solde { background:var(--navy); color:#fff; border:0; }
+  .solde small { color:#cbd5e1; font-weight:600; display:block; }
+  .solde .gros { font-size:34px; font-weight:800; line-height:1.1; margin:2px 0 10px; white-space:nowrap; }
+  .solde .lignes { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; border-top:1px solid rgba(255,255,255,.18); padding-top:10px; margin-bottom:14px; }
+  .solde .lignes b { display:block; font-size:15px; color:#fff; white-space:nowrap; }
+  .solde .lignes span { font-size:12px; color:#cbd5e1; }
+  .solde button { width:100%; background:var(--amber); color:var(--navy); font-size:17px; padding:13px; }
+  .solde button:hover { background:#e0a500; }
+  .solde .info { font-size:13px; color:#cbd5e1; margin-top:8px; }
+  .chiffres { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+  .chiffres small { color:var(--muted); font-weight:600; display:block; font-size:13px; }
+  .chiffres strong { font-size:21px; display:block; white-space:nowrap; }
+  .barre { height:12px; background:#e5e7eb; border-radius:999px; overflow:hidden; margin:8px 0 4px; }
+  .barre i { display:block; height:100%; background:var(--amber); border-radius:999px; }
+  .lien { font-family:ui-monospace,Consolas,monospace; font-size:14px; background:#eef2ff; color:var(--blue-d); border-radius:8px; padding:8px 10px; word-break:break-all; margin:6px 0 10px; }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; }
+  .liste { display:grid; gap:8px; }
+  .ligne { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .ligne .g { min-width:0; } .ligne .g b { display:block; overflow-wrap:anywhere; } .ligne .g small { color:var(--muted); }
+  .ligne .d { text-align:right; white-space:nowrap; } .ligne .d small { display:block; color:var(--muted); }
+  .badge { display:inline-block; border-radius:999px; padding:2px 9px; font-size:13px; font-weight:700; }
+  .b-relance { background:#fef3c7; color:#92400e; } .b-expire { background:var(--red-bg); color:var(--red); } .b-ok { background:var(--green-bg); color:var(--green); }
+  .b-attente { background:#fef3c7; color:#92400e; } .b-paye { background:var(--green-bg); color:var(--green); } .b-refuse { background:var(--red-bg); color:var(--red); }
+  .vide { color:var(--muted); text-align:center; padding:14px; }
+  .regle { font-size:14px; color:var(--muted); }
+</style>
+</head>
+<body>
+<header><div class="in"><img src="logo.svg" alt=""><div><b>Espace agent</b><span>TRA-MANAGER · Tra Business Center</span></div>
+  <button class="ghost petit sortir hidden" id="sortir" type="button">Se déconnecter</button></div></header>
+<main>
+
+  <section id="connexion" class="card" style="max-width:420px; margin:16px auto">
+    <h1>Connexion agent</h1>
+    <p>Entrez votre code agent et le PIN donné par Tra Business Center.</p>
+    <form id="formCnx" autocomplete="on">
+      <label for="code">Code agent</label>
+      <input id="code" placeholder="AG-07" autocapitalize="characters" autocomplete="username" required maxlength="40">
+      <label for="pin">PIN</label>
+      <input id="pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="current-password" required>
+      <button type="submit" style="margin-top:14px; width:100%">Ouvrir mon espace</button>
+      <div class="msg" id="msgCnx" role="alert"></div>
+    </form>
+    <p style="font-size:14px; margin-top:14px">PIN oublié ou bloqué ? Contactez le responsable au +223 92 15 58 70.</p>
+  </section>
+
+  <section id="espace" class="hidden">
+    <h1 id="bonjour"></h1>
+    <p id="sousTitre"></p>
+
+    <div class="card solde" style="margin-top:14px">
+      <small>Disponible au retrait</small>
+      <div class="gros" id="dispo">–</div>
+      <div class="lignes">
+        <div><b id="attente">–</b><span>En attente (moins de <span id="delai">7</span> j)</span></div>
+        <div><b id="encours">–</b><span>Retrait demandé</span></div>
+        <div><b id="verse">–</b><span>Déjà reçu</span></div>
+      </div>
+      <button id="retirer" type="button">Demander mon retrait</button>
+      <div class="info" id="infoRetrait"></div>
+      <div class="msg" id="msgRetrait" role="alert"></div>
+    </div>
+
+    <h2 id="titreMois">Ce mois-ci</h2>
+    <div class="chiffres">
+      <div class="card"><small>Nouveaux clients</small><strong id="mNouveaux">–</strong></div>
+      <div class="card"><small>Renouvellements</small><strong id="mRenouv">–</strong></div>
+      <div class="card"><small>Ventes</small><strong id="mChiffre">–</strong></div>
+      <div class="card"><small>Ma commission</small><strong id="mCommission">–</strong></div>
+    </div>
+    <div class="card" id="carteprime" style="margin-top:10px">
+      <b id="primeTitre"></b>
+      <div class="barre"><i id="primeBarre" style="width:0"></i></div>
+      <small id="primeTexte" style="color:var(--muted)"></small>
+    </div>
+
+    <h2>Mon lien à partager</h2>
+    <div class="card">
+      <p style="margin-top:0">Chaque client qui achète par ce lien vous est attribué.</p>
+      <div class="lien" id="lien"></div>
+      <div class="actions">
+        <button class="ghost petit" id="copier" type="button">Copier le lien</button>
+        <a class="btn petit" id="partager" target="_blank" rel="noopener">Partager sur WhatsApp</a>
+      </div>
+    </div>
+
+    <h2>Mes clients <small id="nbClients" style="color:var(--muted); font-weight:600"></small></h2>
+    <div class="card"><div class="liste" id="clients"></div></div>
+
+    <h2>Mes dernières ventes</h2>
+    <div class="card"><div class="liste" id="ventes"></div></div>
+
+    <h2>Mes retraits</h2>
+    <div class="card"><div class="liste" id="retraits"></div></div>
+
+    <p class="regle" id="regle" style="margin-top:18px"></p>
+    <div class="msg" id="msgEsp" role="alert"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var API = 'https://vcwwvolnyndmygshpvrf.supabase.co/functions/v1/paiement-licence';
+  var $ = function (id) { return document.getElementById(id); };
+  var fcfa = function (n) { return Math.round(n || 0).toLocaleString('fr-FR').replace(/ | /g, ' ') + ' FCFA'; };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var jour = function (d) { return d ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : ''; };
+  var mem = function (st) { return { get: function (k) { try { return st().getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { v == null ? st().removeItem(k) : st().setItem(k, v); } catch (e) { /* */ } } }; };
+  var session = mem(function () { return sessionStorage; }), local = mem(function () { return localStorage; });
+  var JETON = session.get('tm_agent_jeton') || '';
+  var D = null;
+
+  function appel(chemin, corps) {
+    var h = { 'Content-Type': 'application/json' }; if (JETON) h['x-agent-token'] = JETON;
+    return fetch(API + chemin, { method: corps ? 'POST' : 'GET', headers: h, body: corps ? JSON.stringify(corps) : undefined })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error(j.message || ('Erreur ' + r.status)); e.status = r.status; throw e; } return j; }); });
+  }
+  function msg(id, cls, t) { $(id).className = 'msg ' + cls; $(id).textContent = t || ''; }
+
+  function charger() {
+    msg('msgEsp', '', '');
+    return appel('/agent/moi').then(function (j) {
+      D = j; afficher(j);
+      $('connexion').classList.add('hidden'); $('espace').classList.remove('hidden'); $('sortir').classList.remove('hidden');
+    }).catch(function (e) {
+      if (e.status === 401 || e.status === 403) { deconnecter(); msg('msgCnx', 'err', e.message); return; }
+      msg('msgEsp', 'err', e.message || 'Connexion impossible. Vérifiez Internet.');
+    });
+  }
+
+  function afficher(j) {
+    var prenom = String(j.agent.nom || '').split(' ')[0];
+    $('bonjour').textContent = 'Bonjour ' + prenom;
+    $('sousTitre').textContent = 'Code agent ' + j.agent.code + (j.agent.telephone ? ' · Orange Money ' + j.agent.telephone : '');
+    var s = j.solde;
+    $('dispo').textContent = fcfa(s.disponible);
+    $('attente').textContent = fcfa(s.en_attente); $('delai').textContent = j.retrait.delai_jours;
+    $('encours').textContent = fcfa(s.demande_en_cours); $('verse').textContent = fcfa(s.deja_verse);
+    var bloque = '';
+    if (!j.agent.telephone) bloque = 'Aucun numéro Orange Money enregistré : contactez le responsable.';
+    else if (s.demande_en_cours > 0) bloque = 'Votre demande de ' + fcfa(s.demande_en_cours) + ' est en cours de paiement.';
+    else if (s.disponible < j.retrait.minimum) bloque = 'Retrait possible à partir de ' + fcfa(j.retrait.minimum) + '.';
+    $('retirer').disabled = !!bloque;
+    $('retirer').textContent = s.disponible >= j.retrait.minimum && !bloque ? 'Demander mon retrait de ' + fcfa(s.disponible) : 'Demander mon retrait';
+    $('infoRetrait').textContent = bloque || ('Envoyé par Orange Money au ' + j.agent.telephone + ', en général le jour même.');
+
+    var m = j.mois;
+    $('titreMois').textContent = 'Ce mois-ci (' + new Date(m.mois + '-15T12:00:00Z').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' }) + ')';
+    $('mNouveaux').textContent = m.nouveaux; $('mRenouv').textContent = m.renouvellements;
+    $('mChiffre').textContent = fcfa(m.chiffre); $('mCommission').textContent = fcfa(m.commission + m.prime);
+    var pr = m.prochaine_prime;
+    if (pr) {
+      $('primeTitre').textContent = 'Prime de ' + fcfa(pr.montant) + ' à ' + pr.seuil + ' nouveaux clients';
+      $('primeBarre').style.width = Math.min(100, Math.round(m.nouveaux / pr.seuil * 100)) + '%';
+      $('primeTexte').textContent = m.nouveaux + ' / ' + pr.seuil + ' · encore ' + pr.reste + ' nouveau' + (pr.reste > 1 ? 'x' : '') + ' client' + (pr.reste > 1 ? 's' : '') + ' ce mois-ci' + (m.prime ? ' · prime déjà gagnée : ' + fcfa(m.prime) : '') + '.';
+    } else if (m.prime) {
+      $('primeTitre').textContent = 'Bravo ! Prime maximale gagnée : ' + fcfa(m.prime); $('primeBarre').style.width = '100%'; $('primeTexte').textContent = 'Elle devient retirable au début du mois prochain.';
+    } else $('carteprime').classList.add('hidden');
+
+    $('lien').textContent = j.lien;
+    $('partager').href = 'https://wa.me/?text=' + encodeURIComponent('Gérez votre boutique avec TRA-MANAGER : caisse, stock et crédits clients, même sans Internet. 15 jours d\'essai gratuit. ' + j.lien);
+
+    $('nbClients').textContent = j.total_clients ? '(' + j.total_clients + ')' : '';
+    $('clients').innerHTML = j.clients.length ? j.clients.slice(0, 40).map(function (c) {
+      var b = c.jours_restants == null ? '' : c.jours_restants < 0 ? '<span class="badge b-expire">Expirée</span>' : c.a_relancer ? '<span class="badge b-relance">À relancer · ' + c.jours_restants + ' j</span>' : '<span class="badge b-ok">Active</span>';
+      return '<div class="ligne"><div class="g"><b>' + esc(c.client) + '</b><small>' + esc(c.offre || '') + (c.telephone ? ' · ' + esc(c.telephone) : '') + '</small></div><div class="d">' + b + (c.expire ? '<small>fin ' + jour(c.expire) + '</small>' : '') + '</div></div>';
+    }).join('') : '<div class="vide">Pas encore de client. Partagez votre lien !</div>';
+
+    $('ventes').innerHTML = j.ventes.length ? j.ventes.slice(0, 20).map(function (v) {
+      return '<div class="ligne"><div class="g"><b>' + esc(v.client) + '</b><small>' + jour(v.date) + ' · ' + (v.type === 'nouveau' ? 'Nouveau' : 'Renouvellement') + ' · ' + fcfa(v.montant) + '</small></div><div class="d"><b>+' + fcfa(v.commission) + '</b><small>' + v.taux + ' %</small></div></div>';
+    }).join('') : '<div class="vide">Aucune vente pour l\'instant.</div>';
+
+    var lib = { DEMANDE: ['b-attente', 'En cours'], PAYE: ['b-paye', 'Reçu'], REFUSE: ['b-refuse', 'Refusé'] };
+    $('retraits').innerHTML = j.retraits.length ? j.retraits.map(function (r) {
+      var l = lib[r.statut] || ['', r.statut];
+      return '<div class="ligne"><div class="g"><b>' + fcfa(r.montant) + '</b><small>demandé le ' + jour(r.demande_le) + (r.traite_le ? ' · traité le ' + jour(r.traite_le) : '') + (r.note ? ' · ' + esc(r.note) : '') + '</small></div><div class="d"><span class="badge ' + l[0] + '">' + l[1] + '</span></div></div>';
+    }).join('') : '<div class="vide">Aucun retrait demandé.</div>';
+
+    var t = j.taux;
+    $('regle').textContent = 'Règle : ' + t.nouveau + ' % sur le 1er paiement de chaque nouveau client, ' + t.renouvellement + ' % sur ses renouvellements pendant ' + t.duree_mois + ' mois'
+      + (t.primes.length ? ', primes : ' + t.primes.map(function (p) { return p.seuil + ' nouveaux = ' + fcfa(p.montant); }).join(', ') : '')
+      + '. Une commission devient retirable ' + j.retrait.delai_jours + ' jours après la vente ; une prime, au début du mois suivant.';
+  }
+
+  $('formCnx').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var code = $('code').value.trim().toUpperCase().replace(/\s+/g, '');
+    msg('msgCnx', '', 'Vérification…');
+    appel('/agent/connexion', { code: code, pin: $('pin').value.trim() }).then(function (j) {
+      JETON = j.jeton; session.set('tm_agent_jeton', JETON); local.set('tm_agent_code', code);
+      $('pin').value = ''; msg('msgCnx', '', '');
+      return charger();
+    }).catch(function (er) { msg('msgCnx', 'err', er.message || 'Connexion impossible. Vérifiez Internet.'); });
+  });
+
+  $('retirer').onclick = function () {
+    if (!D) return;
+    var montant = D.solde.disponible;
+    if (!confirm('Retirer ' + fcfa(montant) + ' vers votre Orange Money ' + D.agent.telephone + ' ?')) return;
+    $('retirer').disabled = true; msg('msgRetrait', '', 'Envoi de la demande…');
+    appel('/agent/retrait', { montant: montant }).then(function () {
+      msg('msgRetrait', 'ok', 'Demande envoyée. Vous serez payé par Orange Money.');
+      return charger();
+    }).catch(function (er) { msg('msgRetrait', 'err', er.message); $('retirer').disabled = false; });
+  };
+
+  $('copier').onclick = function () {
+    var l = D && D.lien; if (!l) return;
+    (navigator.clipboard ? navigator.clipboard.writeText(l) : Promise.reject()).then(function () { $('copier').textContent = 'Lien copié ✓'; setTimeout(function () { $('copier').textContent = 'Copier le lien'; }, 2000); }, function () { prompt('Votre lien :', l); });
+  };
+
+  function deconnecter() { JETON = ''; D = null; session.set('tm_agent_jeton', null); $('espace').classList.add('hidden'); $('sortir').classList.add('hidden'); $('connexion').classList.remove('hidden'); }
+  $('sortir').onclick = deconnecter;
+
+  var code = new URLSearchParams(location.search).get('code') || local.get('tm_agent_code');
+  if (code) $('code').value = code;
+  if (JETON) charger();
+})();
+</script>
+</body>
+</html>
